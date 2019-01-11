@@ -23,7 +23,7 @@ public class MainActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ListView lv = findViewById(R.id.list);
+        ListView lv = getListView();
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // En fer onClick a un element de la llista cridam l'activity d'edició i passam la clau primària
             @Override
@@ -48,6 +48,12 @@ public class MainActivity extends ListActivity {
                 }
         );
         mostraVins(); // Carrega la llista
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mostraVins();
     }
 
     public void mostraVins() {

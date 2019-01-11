@@ -19,6 +19,8 @@ public class DataSourceVi {
             HelperVi.COLUMN_VALOLFATIVA, HelperVi.COLUMN_VALGUSTATIVA,
             HelperVi.COLUMN_VALVISUAL, HelperVi.COLUMN_NOTA, HelperVi.COLUMN_FOTO,
             HelperVi.COLUMN_TIPUS};
+    private String[] allColumnsDenominacio = {HelperVi.COLUMN_IDDENOMINACIO, HelperVi.COLUMN_NOMDENOMINACIO};
+    private String[] allColumnsBodega = {HelperVi.COLUMN_IDBODEGA, HelperVi.COLUMN_NOMBODEGA};
 
     public DataSourceVi(Context context) { //CONSTRUCTOR
         dbAjuda = new HelperVi(context);
@@ -132,4 +134,92 @@ public class DataSourceVi {
         return v;
     }
 //CREAREM EL MÈTODES QUE ENS FACIN FALTA EN FUNCIÓ DE LA NOSTRA BASE DE DADES
+    //bodega
+    public Bodega createBodega(Bodega bodega) {
+        // insert d'una nova bodega
+        ContentValues values = new ContentValues();
+        values.put(HelperVi.COLUMN_NOMBODEGA, bodega.getNomBodega());
+        values.put(HelperVi.COLUMN_IDBODEGA, bodega.getIdBodega());
+        long insertId = database.insert(HelperVi.TABLE_BODEGA, null, values);
+        bodega.setIdBodega(insertId);
+        return bodega;
+    }
+
+    public boolean updateBodega(Bodega bodega) {
+        // update vi
+        ContentValues values = new ContentValues();
+        long idBodega = bodega.getIdBodega();
+        values.put(HelperVi.COLUMN_NOMBODEGA, bodega.getNomBodega());
+        return database.update(HelperVi.TABLE_BODEGA, values, HelperVi.COLUMN_IDBODEGA + "=" + idBodega, null) > 0;
+    }
+
+    public void deleteBodega(Bodega bodega) {
+        long idBodega = bodega.getIdBodega();
+        database.delete(HelperVi.TABLE_BODEGA, HelperVi.COLUMN_IDBODEGA + " = " + idBodega, null);
+    }
+
+    public List<Bodega> getAllBodega() {
+        List<Bodega> bod = new ArrayList<Bodega>();
+        Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsBodega, null, null, null, null,
+                null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Bodega bodega = cursorToBodega(cursor);
+            bod.add(bodega);
+            cursor.moveToNext();
+        }
+        // Make sure to close the cursor
+        cursor.close();
+        return bod;
+    }
+    private Bodega cursorToBodega(Cursor cursor) {
+        Bodega v = new Bodega();
+        v.setIdBodega(cursor.getLong(0));
+        v.setNomBodega(cursor.getString(1));
+        return v;
+    }
+
+    //denominacio
+    public Denominacio createDenominacio(Denominacio denominacio) {
+        // insert d'una nova bodega
+        ContentValues values = new ContentValues();
+        values.put(HelperVi.COLUMN_NOMDENOMINACIO, denominacio.getNomDenominacio());
+        values.put(HelperVi.COLUMN_IDDENOMINACIO, denominacio.getIdDenominacio());
+        long insertId = database.insert(HelperVi.TABLE_DENOMINACIO, null, values);
+        denominacio.setIdDenominacio(insertId);
+        return denominacio;
+    }
+    public boolean updateDenominacio(Denominacio denominacio) {
+        // update den
+        ContentValues values = new ContentValues();
+        long idDenominacio = denominacio.getIdDenominacio();
+        values.put(HelperVi.COLUMN_NOMDENOMINACIO, denominacio.getNomDenominacio());
+        return database.update(HelperVi.TABLE_DENOMINACIO, values, HelperVi.COLUMN_IDDENOMINACIO + "=" + idDenominacio, null) > 0;
+    }
+
+    public void deleteDenominacio(Denominacio denominacio) {
+        long idDenominacio = denominacio.getIdDenominacio();
+        database.delete(HelperVi.TABLE_DENOMINACIO, HelperVi.COLUMN_IDDENOMINACIO + " = " + idDenominacio, null);
+    }
+    public List<Denominacio> getAllDenominacio() {
+        List<Denominacio> denoms = new ArrayList<Denominacio>();
+        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO, allColumnsDenominacio, null, null, null, null,
+                null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Denominacio denominacio = cursorToDenominacio(cursor);
+            denoms.add(denominacio);
+            cursor.moveToNext();
+        }
+        // Make sure to close the cursor
+        cursor.close();
+        return denoms;
+    }
+    private Denominacio cursorToDenominacio(Cursor cursor) {
+        Denominacio v = new Denominacio();
+        v.setIdDenominacio(cursor.getLong(0));
+        v.setNomDenominacio(cursor.getString(1));
+        return v;
+    }
+
 }
