@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends AppCompatActivity {
     private ListAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ListView lv = getListView();
+        ListView lv = (ListView) findViewById(R.id.list);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // En fer onClick a un element de la llista cridam l'activity d'edició i passam la clau primària
             @Override
@@ -79,6 +79,6 @@ public class MainActivity extends ListActivity {
         adapter = new SimpleAdapter(this, llista,R.layout.llistavins,
                 new String[]{"id", "nomVi", "data", "tipus"},
                 new int[]{R.id.id, R.id.nomVi, R.id.data, R.id.tipus});
-        setListAdapter(adapter);
+        //lv.setAdapter(adapter);
     }
 }
