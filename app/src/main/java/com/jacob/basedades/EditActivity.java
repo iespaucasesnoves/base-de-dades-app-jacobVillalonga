@@ -12,17 +12,25 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class EditActivity extends AppCompatActivity {
 
-    DataSourceVi db;
+    DataSourceVi bd = new DataSourceVi(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         Button button = (Button) findViewById(R.id.button);
-
+        Bundle bundle = getIntent().getExtras();
+        String id = bundle.getString("ID");
+        {
+            TextView idVi = findViewById(R.id.idVi);
+            if (id != ""){
+                idVi.setText(id);
+            }
+        }
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //agafam les dades de l'editActivity
@@ -37,7 +45,11 @@ public class EditActivity extends AppCompatActivity {
                 //String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
                 long idBodega = 1;
                 long idDenominacio = 1;
-                //...
+                String valOlfativa = "Olor";
+                String valGustativa = "Sabor";
+                String valVisual = "Color";
+                int nota = 1;
+                String foto = "noFoto";
 
                 //cream un objecte Vi amb les dades
                 Vi nouVi = new Vi();
@@ -49,9 +61,18 @@ public class EditActivity extends AppCompatActivity {
                 nouVi.setPreu(preu);
                 nouVi.setComentari(comentari);
                 nouVi.setTipus(tipus);
+                nouVi.setIdBodega(idBodega);
+                nouVi.setIdDenominacio(idDenominacio);
+                nouVi.setValGustativa(valGustativa);
+                nouVi.setValOlfativa(valOlfativa);
+                nouVi.setValVisual(valVisual);
+                nouVi.setNota(nota);
+                nouVi.setFoto(foto);
                 //...
-                db.createVi(nouVi);
-                //DataSourceVi.createVi(nouVi);
+
+                bd.open();
+                bd.createVi(nouVi);
+                bd.close();
             }
         });
     }

@@ -1,7 +1,6 @@
 package com.jacob.basedades;
 
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,11 +18,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListAdapter adapter;
+    public ListView lv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ListView lv = (ListView) findViewById(R.id.list);
+        lv = (ListView) findViewById(R.id.list);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // En fer onClick a un element de la llista cridam l'activity d'edició i passam la clau primària
             @Override
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             Vi vi = llistaVins.get(i);
             map.put("id", String.valueOf(vi.getId()));
             map.put("nomVi", vi.getNomVi());
+            map.put("anada", vi.getAnada());
             map.put("data", vi.getData());
             map.put("tipus", vi.getTipus());
             llista.add(map);
@@ -77,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         bd.close();
         //Assignar a la listview
         adapter = new SimpleAdapter(this, llista,R.layout.llistavins,
-                new String[]{"id", "nomVi", "data", "tipus"},
-                new int[]{R.id.id, R.id.nomVi, R.id.data, R.id.tipus});
-        //lv.setAdapter(adapter);
+                new String[]{"id","nomVi", "anada", "data", "tipus"},
+                new int[]{R.id.id,R.id.nomVi, R.id.anada, R.id.data, R.id.tipus});
+        lv.setAdapter(adapter);
     }
 }

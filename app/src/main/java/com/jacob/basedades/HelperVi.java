@@ -32,7 +32,7 @@ public class HelperVi extends SQLiteOpenHelper {
     public static final String TABLE_TIPUS = "tipus";
     public static final String COLUMN__TIPUS = "tipus";
     private static final String DATABASE_NAME = "wineapp";
-    private static final int DATABASE_VERSION = 3; // Controla la versió de la base de dades
+    private static final int DATABASE_VERSION = 5; // Controla la versió de la base de dades
 
     // Setències de creació de la base de dades
     private static final String DATABASE_CREATE_VI = "create table "
@@ -72,9 +72,13 @@ public class HelperVi extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database) {
         // CREAM LA BASE DE DADES
         database.execSQL(DATABASE_CREATE_VI);
+
+        //vins de prova
         //,'nom','2010','Tinto','Lloc','grad','12-12-12','no comments','1','1','8€','4','3','5','4','noFoto'
-        database.execSQL(" insert into "+TABLE_VI+"(vi) values(('1'))");
-        database.execSQL(" insert into "+TABLE_VI+"(vi) values(('2'))");
+        database.execSQL(" insert into "+TABLE_VI+"(nomVi,anada,data,tipus) values('vi1','anada1','12-12-12','Tipus1')");
+        database.execSQL(" insert into "+TABLE_VI+"(nomVi,anada,data,tipus) values('vi2','2010','10/5/2018','Rosat')");
+
+
         database.execSQL(DATABASE_CREATE_BODEGA);
         database.execSQL(DATABASE_CREATE_DENOMINACIO);
         database.execSQL(DATABASE_CREATE_TIPUS);
