@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,9 @@ public class DataSourceVi {
             HelperVi.COLUMN_VALOLFATIVA, HelperVi.COLUMN_VALGUSTATIVA,
             HelperVi.COLUMN_VALVISUAL, HelperVi.COLUMN_NOTA, HelperVi.COLUMN_FOTO,
             HelperVi.COLUMN_TIPUS};
-    private String[] allColumnsDenominacio = {HelperVi.COLUMN_IDDENOMINACIO, HelperVi.COLUMN_NOMDENOMINACIO};
-    private String[] allColumnsBodega = {HelperVi.COLUMN_IDBODEGA, HelperVi.COLUMN_NOMBODEGA};
+    private String[] allColumnsDenominacio = {HelperVi.COLUMN__IDDENOMINACIO, HelperVi.COLUMN_NOMDENOMINACIO};
+    private String[] allColumnsBodega = {HelperVi.COLUMN__IDBODEGA, HelperVi.COLUMN_NOMBODEGA};
+    private String[] allColumnsTipus = {HelperVi.COLUMN_TIPUS};
 
     public DataSourceVi(Context context) { //CONSTRUCTOR
         dbAjuda = new HelperVi(context);
@@ -123,7 +125,7 @@ public class DataSourceVi {
         v.setGraduacio(cursor.getString(4));
         v.setData(cursor.getString(5));
         v.setComentari(cursor.getString(6));
-        v.setIdBodega(cursor.getLong(7));
+        v.setTipus(cursor.getString(7));
         v.setIdBodega(cursor.getLong(8));
         v.setPreu(cursor.getFloat(9));
         v.setValOlfativa(cursor.getString(10));
@@ -219,6 +221,26 @@ public class DataSourceVi {
         Denominacio v = new Denominacio();
         v.setIdDenominacio(cursor.getLong(0));
         v.setNomDenominacio(cursor.getString(1));
+        return v;
+    }
+    //tipus
+
+    public List<String> getAllTipus() {
+        List<String> listTipus = new ArrayList<String>();
+        Cursor cursor = database.query(HelperVi.TABLE_TIPUS, allColumnsTipus, null, null, null, null,
+                null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            String tipus = cursorToTipus(cursor);
+            listTipus.add(tipus);
+            cursor.moveToNext();
+        }
+        // Make sure to close the cursor
+        cursor.close();
+        return listTipus;
+    }
+    private String cursorToTipus(Cursor cursor) {
+        String v = cursor.getString(0);
         return v;
     }
 

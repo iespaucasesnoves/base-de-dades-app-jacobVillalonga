@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent in=new Intent(getApplicationContext(),EditActivity.class);
-                        in.putExtra("ID", "");
+                        in.putExtra("ID", "0");
                         startActivity(in);
                     }
                 }

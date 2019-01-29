@@ -8,11 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
 
@@ -25,20 +28,28 @@ public class EditActivity extends AppCompatActivity {
         Button button2 = (Button) findViewById(R.id.button2);
         Bundle bundle = getIntent().getExtras();
         String id = bundle.getString("ID");
+        String tipus = bundle.getString("TIPUS");
+        spinnerTipus(tipus);
+        spinnerBodega("");
+        spinnerDenom("");
+
         {
             TextView idVi = findViewById(R.id.idVi);
-            if (id != ""){
+            if (!id.equals("0")){
                 idVi.setText(id);
                 bd.open();
                 Vi vi = bd.getVi(Integer.parseInt(id));
                 bd.close();
                 emplenaDades(vi);
+            }else{
+                button2.setVisibility(View.INVISIBLE);
+                idVi.setText(id);
             }
         }
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String id = ((TextView)findViewById(R.id.idVi)).getText().toString();
-                if (id != ""){
+                if (!id.equals("0")){
                     updateVi();
                 } else {
                     insertVi();
@@ -48,11 +59,78 @@ public class EditActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String id = ((TextView)findViewById(R.id.idVi)).getText().toString();
-                if (id != "") {
+                if (!id.equals("0")) {
                     deleteVi();
                 }
             }
         });
+    }
+
+    private void spinnerTipus(String t) {
+        DataSourceVi bd;
+        bd = new DataSourceVi(this);
+        bd.open();
+        List<String> llista;
+        llista=bd.getAllTipus();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner3);
+        // Crear adapter
+        ArrayAdapter<String> dataAdapter = new
+                ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, llista);
+        // Drop down estil – llista amb radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // assignar adapter
+        spinner.setAdapter(dataAdapter);
+        if (t!=null && !t.equals("")) {
+            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
+        }
+        bd.close();
+    }
+    private void spinnerBodega(String t) {
+        DataSourceVi bd;
+        bd = new DataSourceVi(this);
+        bd.open();
+        List<Bodega> llista;
+        llista=bd.getAllBodega();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
+        // Crear adapter
+        ArrayAdapter<Bodega> dataAdapter = new
+                ArrayAdapter<Bodega>(this,android.R.layout.simple_spinner_item, llista);
+        // Drop down estil – llista amb radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // assignar adapter
+        spinner.setAdapter(dataAdapter);
+        if (t!=null && !t.equals("")) {
+            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
+        }
+        bd.close();
+    }
+    private void spinnerDenom(String t) {
+        DataSourceVi bd;
+        bd = new DataSourceVi(this);
+        bd.open();
+        List<Denominacio> llista;
+        llista=bd.getAllDenominacio();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        // Crear adapter
+        ArrayAdapter<Denominacio> dataAdapter = new
+                ArrayAdapter<Denominacio>(this,android.R.layout.simple_spinner_item, llista);
+        // Drop down estil – llista amb radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // assignar adapter
+        spinner.setAdapter(dataAdapter);
+        if (t!=null && !t.equals("")) {
+            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
+        }
+        bd.close();
+    }
+
+    private void selectValue(Spinner spinner, Object value) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).equals(value)) {
+                spinner.setSelection(i);
+                break;
+            }
+        }
     }
 
     public void emplenaDades(Vi vi){
@@ -83,8 +161,7 @@ public class EditActivity extends AppCompatActivity {
         String graduacio = ((EditText) findViewById(R.id.editText5)).getText().toString();
         double preu = Double.parseDouble(((EditText) findViewById(R.id.editText6)).getText().toString());
         String comentari = ((EditText) findViewById(R.id.editText7)).getText().toString();
-        String tipus = "Tinto";
-        //String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
+        String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
         long idBodega = 1;
         long idDenominacio = 1;
         String valOlfativa = "Olor";
