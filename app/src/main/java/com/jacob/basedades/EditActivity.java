@@ -9,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,8 @@ import java.util.List;
 public class EditActivity extends AppCompatActivity {
 
     DataSourceVi bd = new DataSourceVi(this);
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,8 +34,6 @@ public class EditActivity extends AppCompatActivity {
         String id = bundle.getString("ID");
         String tipus = bundle.getString("TIPUS");
         spinnerTipus(tipus);
-        spinnerBodega("");
-        spinnerDenom("");
 
         {
             TextView idVi = findViewById(R.id.idVi);
@@ -39,11 +41,13 @@ public class EditActivity extends AppCompatActivity {
                 idVi.setText(id);
                 bd.open();
                 Vi vi = bd.getVi(Integer.parseInt(id));
-                bd.close();
                 emplenaDades(vi);
+                bd.close();
             }else{
                 button2.setVisibility(View.INVISIBLE);
                 idVi.setText(id);
+                montaAutocompleta("","");
+                montaAutocompleta2("","");
             }
         }
         button.setOnClickListener(new View.OnClickListener() {
@@ -67,59 +71,21 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void spinnerTipus(String t) {
+        Spinner spinnerTipus = (Spinner) findViewById(R.id.spinner3);
         DataSourceVi bd;
         bd = new DataSourceVi(this);
         bd.open();
         List<String> llista;
         llista=bd.getAllTipus();
-        Spinner spinner = (Spinner) findViewById(R.id.spinner3);
         // Crear adapter
         ArrayAdapter<String> dataAdapter = new
                 ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, llista);
         // Drop down estil – llista amb radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // assignar adapter
-        spinner.setAdapter(dataAdapter);
+        spinnerTipus.setAdapter(dataAdapter);
         if (t!=null && !t.equals("")) {
-            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
-        }
-        bd.close();
-    }
-    private void spinnerBodega(String t) {
-        DataSourceVi bd;
-        bd = new DataSourceVi(this);
-        bd.open();
-        List<Bodega> llista;
-        llista=bd.getAllBodega();
-        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
-        // Crear adapter
-        ArrayAdapter<Bodega> dataAdapter = new
-                ArrayAdapter<Bodega>(this,android.R.layout.simple_spinner_item, llista);
-        // Drop down estil – llista amb radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // assignar adapter
-        spinner.setAdapter(dataAdapter);
-        if (t!=null && !t.equals("")) {
-            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
-        }
-        bd.close();
-    }
-    private void spinnerDenom(String t) {
-        DataSourceVi bd;
-        bd = new DataSourceVi(this);
-        bd.open();
-        List<Denominacio> llista;
-        llista=bd.getAllDenominacio();
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        // Crear adapter
-        ArrayAdapter<Denominacio> dataAdapter = new
-                ArrayAdapter<Denominacio>(this,android.R.layout.simple_spinner_item, llista);
-        // Drop down estil – llista amb radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // assignar adapter
-        spinner.setAdapter(dataAdapter);
-        if (t!=null && !t.equals("")) {
-            selectValue(spinner,t); // Si hi ha un valor assignat posicionar-se
+            selectValue(spinnerTipus,t); // Si hi ha un valor assignat posicionar-se
         }
         bd.close();
     }
@@ -134,6 +100,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void emplenaDades(Vi vi){
+        Spinner spinnerTipus = (Spinner) findViewById(R.id.spinner3);
         ((EditText) findViewById(R.id.editText)).setText(vi.getNomVi());
         ((EditText) findViewById(R.id.editText2)).setText(vi.getAnada());
         ((EditText) findViewById(R.id.editText3)).setText(vi.getLloc());
@@ -141,15 +108,38 @@ public class EditActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.editText5)).setText(vi.getGraduacio());
         ((EditText) findViewById(R.id.editText6)).setText(Double.toString(vi.getPreu()));
         ((EditText) findViewById(R.id.editText7)).setText(vi.getComentari());
-        String tipus = "Tinto";
-        //String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
-        long idBodega = 1;
-        long idDenominacio = 1;
-        String valOlfativa = "Olor";
-        String valGustativa = "Sabor";
-        String valVisual = "Color";
+        selectValue(spinnerTipus,vi.getTipus());
+        montaAutocompleta(bd.getNomBodega(vi.getIdBodega()),"");
+        montaAutocompleta2(bd.getNomDenominacio(vi.getIdDenominacio()),"");
+        ((RatingBar) findViewById(R.id.ratingBar)).setRating(Float.parseFloat(vi.getValGustativa()));
+        ((RatingBar) findViewById(R.id.ratingBar2)).setRating(Float.parseFloat(vi.getValOlfativa()));
+        ((RatingBar) findViewById(R.id.ratingBar3)).setRating(Float.parseFloat(vi.getValVisual()));
         int nota = 1;
         String foto = "noFoto";
+    }
+    private void montaAutocompleta(String b,String d){
+        List<String> llista;
+        llista=bd.getLlistaBodegues();
+        ArrayAdapter<String> adapter = new
+                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llista);
+        AutoCompleteTextView bodega = (AutoCompleteTextView) findViewById(R.id.acBodega);
+        bodega.setThreshold(0);
+        bodega.setAdapter(adapter);
+        if (b!=null && !b.equals("")) {
+            bodega.setText(b,true);
+        }
+    }
+    private void montaAutocompleta2(String b,String d){
+        List<String> llista;
+        llista=bd.getLlistaDenominacions();
+        ArrayAdapter<String> adapter = new
+                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llista);
+        AutoCompleteTextView denominacio = (AutoCompleteTextView) findViewById(R.id.acDenominacio);
+        denominacio.setThreshold(0);
+        denominacio.setAdapter(adapter);
+        if (b!=null && !b.equals("")) {
+            denominacio.setText(b,true);
+        }
     }
 
     public void insertVi(){
@@ -164,9 +154,9 @@ public class EditActivity extends AppCompatActivity {
         String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
         long idBodega = 1;
         long idDenominacio = 1;
-        String valOlfativa = "Olor";
-        String valGustativa = "Sabor";
-        String valVisual = "Color";
+        String valOlfativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar)).getRating());
+        String valGustativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar2)).getRating());
+        String valVisual = Float.toString(((RatingBar) findViewById(R.id.ratingBar3)).getRating());
         int nota = 1;
         String foto = "noFoto";
 

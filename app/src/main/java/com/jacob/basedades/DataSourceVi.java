@@ -20,6 +20,8 @@ public class DataSourceVi {
             HelperVi.COLUMN_VALOLFATIVA, HelperVi.COLUMN_VALGUSTATIVA,
             HelperVi.COLUMN_VALVISUAL, HelperVi.COLUMN_NOTA, HelperVi.COLUMN_FOTO,
             HelperVi.COLUMN_TIPUS};
+    private String[] allDenominacio = {HelperVi.COLUMN_NOMDENOMINACIO};
+    private String[] allBodega = {HelperVi.COLUMN_NOMBODEGA};
     private String[] allColumnsDenominacio = {HelperVi.COLUMN__IDDENOMINACIO, HelperVi.COLUMN_NOMDENOMINACIO};
     private String[] allColumnsBodega = {HelperVi.COLUMN__IDBODEGA, HelperVi.COLUMN_NOMBODEGA};
     private String[] allColumnsTipus = {HelperVi.COLUMN_TIPUS};
@@ -125,14 +127,15 @@ public class DataSourceVi {
         v.setGraduacio(cursor.getString(4));
         v.setData(cursor.getString(5));
         v.setComentari(cursor.getString(6));
-        v.setTipus(cursor.getString(7));
-        v.setIdBodega(cursor.getLong(8));
+        v.setIdBodega(cursor.getLong(7));
+        v.setIdDenominacio(cursor.getLong(8));
         v.setPreu(cursor.getFloat(9));
         v.setValOlfativa(cursor.getString(10));
         v.setValGustativa(cursor.getString(11));
         v.setValVisual(cursor.getString(12));
         v.setNota(cursor.getInt(13));
         v.setFoto(cursor.getString(14));
+        v.setTipus(cursor.getString(15));
         return v;
     }
 //CREAREM EL MÈTODES QUE ENS FACIN FALTA EN FUNCIÓ DE LA NOSTRA BASE DE DADES
@@ -146,33 +149,32 @@ public class DataSourceVi {
         bodega.setIdBodega(insertId);
         return bodega;
     }
-
-    public boolean updateBodega(Bodega bodega) {
-        // update vi
-        ContentValues values = new ContentValues();
-        long idBodega = bodega.getIdBodega();
-        values.put(HelperVi.COLUMN_NOMBODEGA, bodega.getNomBodega());
-        return database.update(HelperVi.TABLE_BODEGA, values, HelperVi.COLUMN_IDBODEGA + "=" + idBodega, null) > 0;
-    }
-
-    public void deleteBodega(Bodega bodega) {
-        long idBodega = bodega.getIdBodega();
-        database.delete(HelperVi.TABLE_BODEGA, HelperVi.COLUMN_IDBODEGA + " = " + idBodega, null);
-    }
-
-    public List<Bodega> getAllBodega() {
-        List<Bodega> bod = new ArrayList<Bodega>();
+    public List<String> getLlistaBodegues(){
+        List<String> llista = new ArrayList<String>();
         Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsBodega, null, null, null, null,
                 null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Bodega bodega = cursorToBodega(cursor);
-            bod.add(bodega);
+            String bodega = cursorToBodega(cursor).getNomBodega();
+            llista.add(bodega);
             cursor.moveToNext();
         }
         // Make sure to close the cursor
         cursor.close();
-        return bod;
+        return llista;
+    }
+    public String getNomBodega(long id){
+        String nom;
+        Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsBodega, HelperVi.COLUMN__IDBODEGA + " = " + id, null,
+                null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            nom = cursorToBodega(cursor).getNomBodega();
+        } else {
+            nom = new Bodega().getNomBodega();
+        } // id=-1 no trobat
+        cursor.close();
+        return nom;
     }
     private Bodega cursorToBodega(Cursor cursor) {
         Bodega v = new Bodega();
@@ -191,31 +193,32 @@ public class DataSourceVi {
         denominacio.setIdDenominacio(insertId);
         return denominacio;
     }
-    public boolean updateDenominacio(Denominacio denominacio) {
-        // update den
-        ContentValues values = new ContentValues();
-        long idDenominacio = denominacio.getIdDenominacio();
-        values.put(HelperVi.COLUMN_NOMDENOMINACIO, denominacio.getNomDenominacio());
-        return database.update(HelperVi.TABLE_DENOMINACIO, values, HelperVi.COLUMN_IDDENOMINACIO + "=" + idDenominacio, null) > 0;
-    }
-
-    public void deleteDenominacio(Denominacio denominacio) {
-        long idDenominacio = denominacio.getIdDenominacio();
-        database.delete(HelperVi.TABLE_DENOMINACIO, HelperVi.COLUMN_IDDENOMINACIO + " = " + idDenominacio, null);
-    }
-    public List<Denominacio> getAllDenominacio() {
-        List<Denominacio> denoms = new ArrayList<Denominacio>();
-        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO, allColumnsDenominacio, null, null, null, null,
+    public List<String> getLlistaDenominacions(){
+        List<String> llista = new ArrayList<String>();
+        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO, allDenominacio, null, null, null, null,
                 null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Denominacio denominacio = cursorToDenominacio(cursor);
-            denoms.add(denominacio);
+            String denominacio = cursorToDenominacio(cursor).getNomDenominacio();
+            llista.add(denominacio);
             cursor.moveToNext();
         }
         // Make sure to close the cursor
         cursor.close();
-        return denoms;
+        return llista;
+    }
+    public String getNomDenominacio(long id){
+        String nom;
+        Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsDenominacio, HelperVi.COLUMN__IDDENOMINACIO + " = " + id, null,
+                null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            nom = cursorToDenominacio(cursor).getNomDenominacio();
+        } else {
+            nom = new Denominacio().getNomDenominacio();
+        } // id=-1 no trobat
+        cursor.close();
+        return nom;
     }
     private Denominacio cursorToDenominacio(Cursor cursor) {
         Denominacio v = new Denominacio();
