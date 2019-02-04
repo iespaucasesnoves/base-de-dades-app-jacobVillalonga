@@ -43,7 +43,8 @@ public class Vi {
     public String getValGustativa() { return valGustativa; }
     public void setValGustativa(String valGustativa) { this.valGustativa = valGustativa; }
     public String getValVisual() { return valVisual; }
-    public void setValVisual(String valVisual) { this.valVisual = valVisual; }public int getNota() { return nota; }
+    public void setValVisual(String valVisual) { this.valVisual = valVisual; }
+    public int getNota() { return nota; }
     public void setNota(int nota) { this.nota = nota; }
     public String getFoto() { return foto; }
     public void setFoto(String foto) { this.foto = foto; }

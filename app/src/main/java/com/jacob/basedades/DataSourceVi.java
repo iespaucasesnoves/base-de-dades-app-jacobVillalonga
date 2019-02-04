@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,93 +137,121 @@ public class DataSourceVi {
         v.setTipus(cursor.getString(15));
         return v;
     }
-//CREAREM EL MÈTODES QUE ENS FACIN FALTA EN FUNCIÓ DE LA NOSTRA BASE DE DADES
+
     //bodega
-    public Bodega createBodega(Bodega bodega) {
-        // insert d'una nova bodega
-        ContentValues values = new ContentValues();
-        values.put(HelperVi.COLUMN_NOMBODEGA, bodega.getNomBodega());
-        values.put(HelperVi.COLUMN_IDBODEGA, bodega.getIdBodega());
-        long insertId = database.insert(HelperVi.TABLE_BODEGA, null, values);
-        bodega.setIdBodega(insertId);
-        return bodega;
-    }
     public List<String> getLlistaBodegues(){
         List<String> llista = new ArrayList<String>();
         Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsBodega, null, null, null, null,
                 null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            String bodega = cursorToBodega(cursor).getNomBodega();
-            llista.add(bodega);
+            Bodega bodega = cursorToBodega(cursor);
+            String nom = bodega.getNomBodega();
+            llista.add(nom);
             cursor.moveToNext();
         }
-        // Make sure to close the cursor
         cursor.close();
         return llista;
     }
-    public String getNomBodega(long id){
-        String nom;
-        Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsBodega, HelperVi.COLUMN__IDBODEGA + " = " + id, null,
+
+    public String getNomBodega(long id) {
+        Bodega b;
+        Cursor cursor = database.query(HelperVi.TABLE_BODEGA,
+                new String [] {HelperVi.COLUMN__IDBODEGA,HelperVi.COLUMN_NOMBODEGA}, HelperVi.COLUMN__IDBODEGA + " = " + id, null,
                 null, null, null);
-        if (cursor.getCount() > 0) {
+        if (cursor.getCount()>0) {
             cursor.moveToFirst();
-            nom = cursorToBodega(cursor).getNomBodega();
-        } else {
-            nom = new Bodega().getNomBodega();
-        } // id=-1 no trobat
+            b = cursorToBodega(cursor);
+        } else { b=new Bodega(); }    // id=-1 no trobat
         cursor.close();
-        return nom;
+        return b.getNomBodega();
     }
+
+    public long findInsertBodegaPerNom(String bod) {
+        Bodega b;
+        long id;
+        Cursor cursor = database.query(HelperVi.TABLE_BODEGA,
+                new String [] {HelperVi.COLUMN__IDBODEGA,HelperVi.COLUMN_NOMBODEGA}, HelperVi.COLUMN_NOMBODEGA + " = '" + bod+"'", null,
+                null, null, null);
+        if (cursor.getCount()>0) {
+            cursor.moveToFirst();
+            b = cursorToBodega(cursor);
+            id=b.getIdBodega();
+        } else { id=createBodegafromList(bod); }    // id=-1 no trobat
+        cursor.close();
+        return id;
+    }
+
     private Bodega cursorToBodega(Cursor cursor) {
-        Bodega v = new Bodega();
-        v.setIdBodega(cursor.getLong(0));
-        v.setNomBodega(cursor.getString(1));
-        return v;
+        Bodega b = new Bodega();
+        b.setIdBodega(cursor.getLong(0));
+        b.setNomBodega(cursor.getString(1));
+        return b;
+    }
+
+    private long createBodegafromList(String nomBodega) {
+        ContentValues values = new ContentValues();
+        values.put(HelperVi.COLUMN_NOMBODEGA, nomBodega);
+        long insertId = database.insert(HelperVi.TABLE_BODEGA, null,values);
+        return insertId;
     }
 
     //denominacio
-    public Denominacio createDenominacio(Denominacio denominacio) {
-        // insert d'una nova bodega
-        ContentValues values = new ContentValues();
-        values.put(HelperVi.COLUMN_NOMDENOMINACIO, denominacio.getNomDenominacio());
-        values.put(HelperVi.COLUMN_IDDENOMINACIO, denominacio.getIdDenominacio());
-        long insertId = database.insert(HelperVi.TABLE_DENOMINACIO, null, values);
-        denominacio.setIdDenominacio(insertId);
-        return denominacio;
-    }
     public List<String> getLlistaDenominacions(){
         List<String> llista = new ArrayList<String>();
-        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO, allDenominacio, null, null, null, null,
+        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO, allColumnsDenominacio, null, null, null, null,
                 null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            String denominacio = cursorToDenominacio(cursor).getNomDenominacio();
-            llista.add(denominacio);
+            Denominacio denominacio = cursorToDenominacio(cursor);
+            String nom = denominacio.getNomDenominacio();
+            llista.add(nom);
             cursor.moveToNext();
         }
-        // Make sure to close the cursor
         cursor.close();
         return llista;
     }
-    public String getNomDenominacio(long id){
-        String nom;
-        Cursor cursor = database.query(HelperVi.TABLE_BODEGA, allColumnsDenominacio, HelperVi.COLUMN__IDDENOMINACIO + " = " + id, null,
+
+    public String getNomDenominacio(long id) {
+        Denominacio d;
+        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO,
+                new String [] {HelperVi.COLUMN__IDDENOMINACIO,HelperVi.COLUMN_NOMDENOMINACIO}, HelperVi.COLUMN__IDDENOMINACIO + " = " + id, null,
                 null, null, null);
-        if (cursor.getCount() > 0) {
+        if (cursor.getCount()>0) {
             cursor.moveToFirst();
-            nom = cursorToDenominacio(cursor).getNomDenominacio();
-        } else {
-            nom = new Denominacio().getNomDenominacio();
-        } // id=-1 no trobat
+            d = cursorToDenominacio(cursor);
+        } else { d=new Denominacio(); }    // id=-1 no trobat
         cursor.close();
-        return nom;
+        return d.getNomDenominacio();
     }
+
+    public long findInsertDenominacioPerNom(String den) {
+        Denominacio d;
+        long id;
+        Cursor cursor = database.query(HelperVi.TABLE_DENOMINACIO,
+                new String [] {HelperVi.COLUMN__IDDENOMINACIO,HelperVi.COLUMN_NOMDENOMINACIO}, HelperVi.COLUMN_NOMDENOMINACIO + " = '" + den+"'", null,
+                null, null, null);
+        if (cursor.getCount()>0) {
+            cursor.moveToFirst();
+            d = cursorToDenominacio(cursor);
+            id=d.getIdDenominacio();
+        } else { id=createDenominaciofromList(den); }    // id=-1 no trobat
+        cursor.close();
+        return id;
+    }
+
     private Denominacio cursorToDenominacio(Cursor cursor) {
-        Denominacio v = new Denominacio();
-        v.setIdDenominacio(cursor.getLong(0));
-        v.setNomDenominacio(cursor.getString(1));
-        return v;
+        Denominacio d = new Denominacio();
+        d.setIdDenominacio(cursor.getLong(0));
+        d.setNomDenominacio(cursor.getString(1));
+        return d;
+    }
+
+    private long createDenominaciofromList(String nomDenominacio) {
+        ContentValues values = new ContentValues();
+        values.put(HelperVi.COLUMN_NOMDENOMINACIO, nomDenominacio);
+        long insertId = database.insert(HelperVi.TABLE_DENOMINACIO, null,values);
+        return insertId;
     }
     //tipus
 

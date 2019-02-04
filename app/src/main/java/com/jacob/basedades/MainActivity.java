@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(in);
             }
         });
-        Button btNou=(Button) findViewById(R.id.nouBtn);
+            Button btNou=(Button) findViewById(R.id.nouBtn);
         btNou.setOnClickListener(
                 // Cridam l'activity d'edició indicant que es un insert (clau primària en blanc per exemple)
                 new View.OnClickListener() {

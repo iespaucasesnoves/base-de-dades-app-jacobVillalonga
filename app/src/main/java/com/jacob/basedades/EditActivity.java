@@ -1,13 +1,8 @@
 package com.jacob.basedades;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -15,14 +10,12 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
 
     DataSourceVi bd = new DataSourceVi(this);
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +25,6 @@ public class EditActivity extends AppCompatActivity {
         Button button2 = (Button) findViewById(R.id.button2);
         Bundle bundle = getIntent().getExtras();
         String id = bundle.getString("ID");
-        String tipus = bundle.getString("TIPUS");
-        spinnerTipus(tipus);
 
         {
             TextView idVi = findViewById(R.id.idVi);
@@ -47,7 +38,6 @@ public class EditActivity extends AppCompatActivity {
                 button2.setVisibility(View.INVISIBLE);
                 idVi.setText(id);
                 montaAutocompleta("","");
-                montaAutocompleta2("","");
             }
         }
         button.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +90,6 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void emplenaDades(Vi vi){
-        Spinner spinnerTipus = (Spinner) findViewById(R.id.spinner3);
         ((EditText) findViewById(R.id.editText)).setText(vi.getNomVi());
         ((EditText) findViewById(R.id.editText2)).setText(vi.getAnada());
         ((EditText) findViewById(R.id.editText3)).setText(vi.getLloc());
@@ -108,9 +97,9 @@ public class EditActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.editText5)).setText(vi.getGraduacio());
         ((EditText) findViewById(R.id.editText6)).setText(Double.toString(vi.getPreu()));
         ((EditText) findViewById(R.id.editText7)).setText(vi.getComentari());
-        selectValue(spinnerTipus,vi.getTipus());
-        montaAutocompleta(bd.getNomBodega(vi.getIdBodega()),"");
-        montaAutocompleta2(bd.getNomDenominacio(vi.getIdDenominacio()),"");
+        spinnerTipus(vi.getTipus());
+        bd.open();
+        montaAutocompleta(bd.getNomBodega(vi.getIdBodega()),bd.getNomDenominacio(vi.getIdDenominacio()));
         ((RatingBar) findViewById(R.id.ratingBar)).setRating(Float.parseFloat(vi.getValGustativa()));
         ((RatingBar) findViewById(R.id.ratingBar2)).setRating(Float.parseFloat(vi.getValOlfativa()));
         ((RatingBar) findViewById(R.id.ratingBar3)).setRating(Float.parseFloat(vi.getValVisual()));
@@ -118,27 +107,29 @@ public class EditActivity extends AppCompatActivity {
         String foto = "noFoto";
     }
     private void montaAutocompleta(String b,String d){
-        List<String> llista;
-        llista=bd.getLlistaBodegues();
+        List<String> llistaB;
+        List<String> llistaD;
+        DataSourceVi bd;
+        bd = new DataSourceVi(this);
+        bd.open();
+
+        llistaB=bd.getLlistaBodegues();
         ArrayAdapter<String> adapter = new
-                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llista);
+                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llistaB);
         AutoCompleteTextView bodega = (AutoCompleteTextView) findViewById(R.id.acBodega);
         bodega.setThreshold(0);
         bodega.setAdapter(adapter);
         if (b!=null && !b.equals("")) {
             bodega.setText(b,true);
         }
-    }
-    private void montaAutocompleta2(String b,String d){
-        List<String> llista;
-        llista=bd.getLlistaDenominacions();
-        ArrayAdapter<String> adapter = new
-                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llista);
+        llistaD=bd.getLlistaDenominacions();
+        ArrayAdapter<String> adapter2 = new
+                ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice, llistaD);
         AutoCompleteTextView denominacio = (AutoCompleteTextView) findViewById(R.id.acDenominacio);
         denominacio.setThreshold(0);
-        denominacio.setAdapter(adapter);
-        if (b!=null && !b.equals("")) {
-            denominacio.setText(b,true);
+        denominacio.setAdapter(adapter2);
+        if (d!=null && !d.equals("")) {
+            denominacio.setText(d,true);
         }
     }
 
@@ -152,7 +143,6 @@ public class EditActivity extends AppCompatActivity {
         double preu = Double.parseDouble(((EditText) findViewById(R.id.editText6)).getText().toString());
         String comentari = ((EditText) findViewById(R.id.editText7)).getText().toString();
         String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
-        long idBodega = 1;
         long idDenominacio = 1;
         String valOlfativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar)).getRating());
         String valGustativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar2)).getRating());
@@ -161,6 +151,9 @@ public class EditActivity extends AppCompatActivity {
         String foto = "noFoto";
 
         //cream un objecte Vi amb les dades
+        bd.open();
+        AutoCompleteTextView bodega = (AutoCompleteTextView) findViewById(R.id.acBodega);
+        AutoCompleteTextView denominacio = (AutoCompleteTextView) findViewById(R.id.acDenominacio);
         Vi nouVi = new Vi();
         nouVi.setAnada(anada);
         nouVi.setNomVi(nomVi);
@@ -170,16 +163,14 @@ public class EditActivity extends AppCompatActivity {
         nouVi.setPreu(preu);
         nouVi.setComentari(comentari);
         nouVi.setTipus(tipus);
-        nouVi.setIdBodega(idBodega);
-        nouVi.setIdDenominacio(idDenominacio);
+        nouVi.setIdBodega(bd.findInsertBodegaPerNom(bodega.getText().toString()));
+        nouVi.setIdDenominacio(bd.findInsertDenominacioPerNom(denominacio.getText().toString()));
         nouVi.setValGustativa(valGustativa);
         nouVi.setValOlfativa(valOlfativa);
         nouVi.setValVisual(valVisual);
         nouVi.setNota(nota);
         nouVi.setFoto(foto);
-        //...
 
-        bd.open();
         bd.createVi(nouVi);
         bd.close();
         //agafa el codi del nou vi insertat
@@ -196,18 +187,19 @@ public class EditActivity extends AppCompatActivity {
         String graduacio = ((EditText) findViewById(R.id.editText5)).getText().toString();
         double preu = Double.parseDouble(((EditText) findViewById(R.id.editText6)).getText().toString());
         String comentari = ((EditText) findViewById(R.id.editText7)).getText().toString();
-        String tipus = "Tinto";
-        //String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
-        long idBodega = 1;
+        String tipus = ((Spinner) findViewById(R.id.spinner3)).getSelectedItem().toString();
         long idDenominacio = 1;
-        String valOlfativa = "Olor";
-        String valGustativa = "Sabor";
-        String valVisual = "Color";
+        String valOlfativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar)).getRating());
+        String valGustativa = Float.toString(((RatingBar) findViewById(R.id.ratingBar2)).getRating());
+        String valVisual = Float.toString(((RatingBar) findViewById(R.id.ratingBar3)).getRating());
         int nota = 1;
         String foto = "noFoto";
 
         //cream un objecte Vi amb les dades
         Vi nouVi = new Vi();
+        bd.open();
+        AutoCompleteTextView bodega = (AutoCompleteTextView) findViewById(R.id.acBodega);
+        AutoCompleteTextView denominacio = (AutoCompleteTextView) findViewById(R.id.acDenominacio);
         nouVi.setId(id);
         nouVi.setAnada(anada);
         nouVi.setNomVi(nomVi);
@@ -217,8 +209,8 @@ public class EditActivity extends AppCompatActivity {
         nouVi.setPreu(preu);
         nouVi.setComentari(comentari);
         nouVi.setTipus(tipus);
-        nouVi.setIdBodega(idBodega);
-        nouVi.setIdDenominacio(idDenominacio);
+        nouVi.setIdBodega(bd.findInsertBodegaPerNom(bodega.getText().toString()));
+        nouVi.setIdDenominacio(bd.findInsertDenominacioPerNom(denominacio.getText().toString()));
         nouVi.setValGustativa(valGustativa);
         nouVi.setValOlfativa(valOlfativa);
         nouVi.setValVisual(valVisual);
@@ -226,7 +218,6 @@ public class EditActivity extends AppCompatActivity {
         nouVi.setFoto(foto);
         //...
 
-        bd.open();
         bd.updateVi(nouVi);
         bd.close();
     }
