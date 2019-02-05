@@ -37,6 +37,7 @@ public class EditActivity extends AppCompatActivity {
             }else{
                 button2.setVisibility(View.INVISIBLE);
                 idVi.setText(id);
+                spinnerTipus("");
                 montaAutocompleta("","");
             }
         }
